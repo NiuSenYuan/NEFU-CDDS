@@ -10,9 +10,9 @@ typedef struct message
 	int num;       //景点代码 
 	string name;   //景点名称 
 	string pro;    //简介 
-}Ciceroni;       
+}Ciceroni;    
 struct Graph{
-	int vexnum；
+	int vexnum;
 	int arcnum;
 	int arcs[MAXNUM][MAXNUM];
 	int answer[MAXNUM][MAXNUM];  //最短路径 
@@ -95,31 +95,37 @@ struct Graph{
 			}
 		}
 	}
-	//得到景点之间的所有路径 
-	void DFS(int spot1,int spot2,int order)
-	{
-		path[order]=spot1;
-		if(spot1==spot2)
-		{
-			for(int i=1;i<order;i++)
-			{
-				cout<<this->ScenicSpot[path[i]].name<<"->";
-			}
-			cout<<this->ScenicSpot[path[order]].name<<endl;
-			return;
-		}
-		for(int i=1;i<=this->vexnum;i++)
-		{
-			if(!vis[i]&&this->arcs[spot1][i]<10000)
-			{
-				vis[i]=true;
-				DFS(i,spot2,order+1);
-				vis[i]=false;
-			}
-		}
-	} 
 };
 struct Graph G;
+int stk[MAXNUM],top;
+void DFS(int start,int end)
+{
+    stk[top++]=start;
+    G.vis[start]=true;//标记入栈
+	for(int i=1; i<=G.vexnum; i++)
+    {
+        if(G.arcs[start][i]<INF && !G.vis[i])
+        {
+            //表明两点可达且未被访问
+            if(i==end)//DFS到了终点，打印路径
+            {
+                for(int j=0; j<top; j++)
+                {
+                	cout<<G.ScenicSpot[stk[j]].name<<"->";
+                }
+                cout<<G.ScenicSpot[stk[end]].name<<endl;
+                return;
+            }
+            else//不是终点接着DFS
+            {
+                DFS(i,end);
+                top--;//支路全被访问一遍,顶点出栈
+                G.vis[i]=0;//出栈点标记为已出栈，允许下次访问
+            }
+        }
+    }
+    G.vis[start]=false;
+}
 int main()
 {
 	//输入景点数和道路数 
@@ -157,7 +163,7 @@ int main()
 	cin>>view1>>view2;
 	int start=G.GetNum(view1);
 	int end=G.GetNum(view2);
-	G.DFS(start,end,1);	 
+	DFS(start,end);	 
     return 0;
 }
 /*
