@@ -12,7 +12,7 @@ typedef struct message
 	string pro;    //简介 
 }Ciceroni;       
 struct Graph{
-	int vexnum;
+	int vexnum；
 	int arcnum;
 	int arcs[MAXNUM][MAXNUM];
 	int answer[MAXNUM][MAXNUM];  //最短路径 
