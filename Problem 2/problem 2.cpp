@@ -25,6 +25,7 @@ struct Graph{
 		vexnum=0;
 		arcnum=0;
 		memset(arcs,INF,sizeof arcs);
+		memset(answer,INF,sizeof answer);
 		memset(vis,false,sizeof vis);
 	}
 	//得到景点编号 
@@ -43,6 +44,7 @@ struct Graph{
 	void AddEdge(int vex1,int vex2,int dis)
 	{
 		arcs[vex1][vex2]=arcs[vex2][vex1]=dis;
+		answer[vex1][vex2]=answer[vex2][vex1]=dis;
 	}
 	//删除景点 
 	void DeleteSpot(int id)
@@ -77,7 +79,7 @@ struct Graph{
 			{
 				for(int j=1;j<=this->vexnum;j++)
 				{
-					arcs[i][j]=min(arcs[i][j],arcs[i][k]+arcs[k][j]);
+					answer[i][j]=min(answer[i][j],answer[i][k]+answer[k][j]);
 				}
 			}
 		}
@@ -91,7 +93,7 @@ struct Graph{
 			for(int j=i+1;j<=vexnum;j++)
 			{
 				cout<<ScenicSpot[i].name<<"到"<<ScenicSpot[j].name<<"最短距离为:";
-				cout<<arcs[i][j]<<endl;
+				cout<<answer[i][j]<<endl;
 			}
 		}
 	}
@@ -100,11 +102,12 @@ struct Graph G;
 int stk[MAXNUM],top;
 void DFS(int start,int end)
 {
-    stk[top++]=start;
+    stk[top]=start;
+    top++;
     G.vis[start]=true;//标记入栈
 	for(int i=1; i<=G.vexnum; i++)
     {
-        if(G.arcs[start][i]<INF && !G.vis[i])
+        if(G.arcs[start][i]!=INF&&G.arcs[start][i]>0&& !G.vis[i])
         {
             //表明两点可达且未被访问
             if(i==end)//DFS到了终点，打印路径
@@ -113,8 +116,7 @@ void DFS(int start,int end)
                 {
                 	cout<<G.ScenicSpot[stk[j]].name<<"->";
                 }
-                cout<<G.ScenicSpot[stk[end]].name<<endl;
-                return;
+                cout<<G.ScenicSpot[end].name<<endl;
             }
             else//不是终点接着DFS
             {
@@ -124,7 +126,6 @@ void DFS(int start,int end)
             }
         }
     }
-    G.vis[start]=false;
 }
 int main()
 {
