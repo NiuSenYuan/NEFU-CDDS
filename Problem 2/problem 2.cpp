@@ -14,6 +14,7 @@ typedef struct message
 struct Graph{
 	int vexnum;
 	int arcnum;
+	int dis[MAXNUM];     //纪录Dijkstra求出的单源最短路径 
 	int arcs[MAXNUM][MAXNUM];
 	int answer[MAXNUM][MAXNUM];  //最短路径 
 	Ciceroni ScenicSpot[MAXNUM]; //景点信息 
@@ -63,12 +64,53 @@ struct Graph{
 		}
 		Floyd();
 	} 
+	//查询各景点信息 
+	void query(string& Name)
+	{
+		int id=GetNum(Name);
+		cout<<"景点编号："<< ScenicSpot[id].num<<endl;
+		cout<<"景点名称："<< ScenicSpot[id].name<<endl;
+		cout<<"景点简介："<< ScenicSpot[id].pro<<endl;
+		cout<<"与"<< ScenicSpot[id].name<<"直接相邻的景点有："<<endl;
+		for(int i=1;i<=vexnum;i++)
+		{
+			if(arcs[id][i]!=INF)cout<<ScenicSpot[i].name<<endl;
+		}
+	}
 	//更新景点 
 	void UpdateSpot(int id)
 	{
 		string data;
 		cin>>data;
 		ScenicSpot[id].pro=data;
+	} 
+	//用Dijkstra算法计算两点之间的最短路 
+	int Dijkstra(int start,int end)
+	{
+		memset(dis,INF,sizeof dis);
+		memset(vis,false,sizeof vis);
+		dis[start]=0;
+		vis[start]=true;
+		int ans = 0;
+    	for (int i = 1; i < vexnum; i++)
+    	{
+        	int t = -1;
+       	 	for (int j = 1; j <= vexnum; j++)
+        	{
+           		if ((dis[t] > dis[j]||t==-1) && vis[j])
+            	{
+                	t = j;
+            	}
+        	}
+        	vis[t] = false;
+        	ans += dis[t];
+        	for (int j = 1; j <= vexnum; j++)
+        	{
+            	if (vis[j])dis[j] = min(dis[j], dis[t]+arcs[t][j]);
+        	}
+    	}
+    	if (dis[end] == INF)return -1;
+    	return dis[end];
 	} 
 	//弗洛伊德算法求景点之间的最短路 
 	void Floyd()
@@ -99,7 +141,8 @@ struct Graph{
 	}
 };
 struct Graph G;
-int stk[MAXNUM],top;
+int stk[MAXNUM];
+int top;
 void DFS(int start,int end)
 {
     stk[top]=start;
@@ -109,8 +152,7 @@ void DFS(int start,int end)
     {
         if(G.arcs[start][i]!=INF&&G.arcs[start][i]>0&& !G.vis[i])
         {
-            //表明两点可达且未被访问
-            if(i==end)//DFS到了终点，打印路径
+            if(i==end)
             {
                 for(int j=0; j<top; j++)
                 {
@@ -118,11 +160,11 @@ void DFS(int start,int end)
                 }
                 cout<<G.ScenicSpot[end].name<<endl;
             }
-            else//不是终点接着DFS
+            else
             {
                 DFS(i,end);
-                top--;//支路全被访问一遍,顶点出栈
-                G.vis[i]=0;//出栈点标记为已出栈，允许下次访问
+                top--;     //支路全被访问一遍,顶点出栈
+                G.vis[i]=0;
             }
         }
     }
