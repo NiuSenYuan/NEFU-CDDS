@@ -1,177 +1,149 @@
 #include <iostream>
-#include <string>
+#include <fstream>
+#include <queue>
+#include <vector>
+#include <unordered_map>
 using namespace std;
-typedef struct LNode
-{
-    int coe;    //系数coe
-    int exp;    //指数exp
-    struct LNode *next;
-}LNode,*LinkList;
-void CreatePolynomial(LinkList &L,int n)
-{//按指数exp从大到小存多项式
-    L=new LNode;
-    L->next=NULL;
-    for(int i=0;i<n;i++)
-    {
-        LinkList p=new LNode;
-        cin>>p->coe>>p->exp;
-        LinkList pre=L,cur=L->next;      //pre和cur是多项式链表的工作指针，分别初始化为头结点和首元结点
-        while(cur&&p->exp<cur->exp)    //若待插入项的指数小于当前结点的指数，指针pre指向当前结点，当前结点的指针cur后移
-        {
-            pre=cur;
-            cur=cur->next;
+struct HuffmanNode {
+    char data;
+    int frequency;
+    HuffmanNode* left;
+    HuffmanNode* right;
+
+    HuffmanNode(char d, int freq) : data(d), frequency(freq), left(nullptr), right(nullptr) {}
+};
+struct CompareNodes {
+    bool operator()(HuffmanNode* left, HuffmanNode* right) {
+        return left->frequency > right->frequency;
+    }
+};
+HuffmanNode* buildHuffmanTree(const unordered_map<char, int>& frequencies) {
+    priority_queue<HuffmanNode*, vector<HuffmanNode*>, CompareNodes> pq;
+    for (auto& entry : frequencies) {
+        pq.push(new HuffmanNode(entry.first, entry.second));
+    }
+    while (pq.size() > 1) {
+        HuffmanNode* left = pq.top();
+        pq.pop();
+
+        HuffmanNode* right = pq.top();
+        pq.pop();
+
+        HuffmanNode* combined = new HuffmanNode('$', left->frequency + right->frequency);
+        combined->left = left;
+        combined->right = right;
+
+        pq.push(combined);
+    }
+
+    return pq.top();
+}
+void generateHuffmanCodes(HuffmanNode* root, const string& code, unordered_map<char, string>& huffmanCodes) {
+    if (root == nullptr) {
+        return;
+    }
+
+    if (root->data != '$') {
+        huffmanCodes[root->data] = code;
+    }
+
+    generateHuffmanCodes(root->left, code + "0", huffmanCodes);
+    generateHuffmanCodes(root->right, code + "1", huffmanCodes);
+}
+string encodeMessage(const string& message, const unordered_map<char, string>& huffmanCodes) {
+    string encodedMessage = "";
+    for (char c : message) {
+        encodedMessage += huffmanCodes[c];
+    }
+    return encodedMessage;
+}
+string decodeMessage(HuffmanNode* root, const string& encodedMessage) {
+    string decodedMessage = "";
+    HuffmanNode* current = root;
+
+    for (char bit : encodedMessage) {
+        if (bit == '0') {
+            current = current->left;
+        } else {
+            current = current->right;
         }
-        p->next=cur;    //待插入项的指数不小于当前结点的指数时，用头插法插入节点
-        pre->next=p;
+
+        if (current->left == nullptr && current->right == nullptr) {
+            decodedMessage += current->data;
+            current = root;
+        }
+    }
+
+    return decodedMessage;
+}
+
+void printHuffmanTree(HuffmanNode* root, int space = 0) {
+    if (root == nullptr) {
+        return;
+    }
+
+    const int spaces = 5;
+    space += spaces;
+
+    printHuffmanTree(root->right, space);
+
+    cout << endl;
+    for (int i = spaces; i < space; i++) {
+        cout << " ";
+    }
+    cout << root->data << "(" << root->frequency << ")" << endl;
+
+    printHuffmanTree(root->left, space);
+}
+void storeHuffmanTree(HuffmanNode* root, ofstream& outFile) {
+    if (root == nullptr) {
+        return;
+    }
+
+    if (root->left == nullptr && root->right == nullptr) {
+        outFile << 'L' << root->data;
+    } else {
+        outFile << 'I';
+        storeHuffmanTree(root->left, outFile);
+        storeHuffmanTree(root->right, outFile);
     }
 }
-void OutputPolynomial(LinkList L)
-{//输出多项式
-    if(!L||!L->next) cout<<0;
-    LinkList p=L->next;     //p是多项式链表的工作指针,初始化为首元结点
-    while(p)
-    {
-        if(p==L->next)     //p指向首元结点时，根据指数的情况输出多项式
-        {
-            if (p->exp!=0)
-                cout<<p->coe<<"x^"<<p->exp;
-            else
-                cout<<p->coe;
-        }
-        else      //p指向其他结点时，根据系数的正负和指数的情况输出多项式
-        {
-            if(p->coe>0) cout<<"+";
-            if(p->exp!=0)
-                cout<<p->coe<<"x^"<<p->exp;
-            else
-                cout<<p->coe;
-        }
-        p=p->next;
+HuffmanNode* readHuffmanTree(ifstream& inFile) {
+    char type;
+    inFile >> type;
+
+    HuffmanNode* root = new HuffmanNode(' ', 0);
+
+    if (type == 'L') {
+        inFile >> root->data;
+    } else {
+        root->left = readHuffmanTree(inFile);
+        root->right = readHuffmanTree(inFile);
     }
-    cout<<endl;
+
+    return root;
 }
-LinkList Add(LinkList LA,LinkList LB)
-{//多项式的加法运算
-    LinkList pa=LA->next;  //pa和pb是链表LA和LB的工作指针，均初始化为首元结点；
-    LinkList pb=LB->next;
-    LinkList LC;
-    CreatePolynomial(LC, 0);    //目标多项式链表LC
-    LinkList pc=LC;            //pc是链表LC的工作指针
-    while(pa&&pb)           //两个工作指针均未到达表尾时
-    {
-        if (pa->exp==pb->exp)    //指数相同，根据系数求和后的情况判断是否需要将结点插入链表LC中
-        {
-            int sum=pa->coe+pb->coe;
-            if (sum)
-            {
-                pa->coe=sum;
-                pc->next=pa;
-                pc=pa;
-                pa=pa->next;
-                pb=pb->next;
-            }
-            else
-            {
-                 pa=pa->next;
-                 pb=pb->next;
-            }
-        }
-        else if(pa->exp>pb->exp)  //指数不同，将指数较大者优先插入链表LC中
-        {
-            pc->next=pa;
-            pc=pa;
-            pa=pa->next;
-        }
-        else {
-            pc->next=pb;
-            pc=pb;
-            pb=pb->next;
-        }
+
+int main() {
+    string message = "hello world";
+    unordered_map<char, int> frequencies;
+    for (char c : message) {
+        frequencies[c]++;
     }
-    pc->next=pa?pa:pb;   //某个链表先遍历完，则将另一链表的剩余部分直接链入LC中
-    return LC;
-}
-void Minus(LinkList LA,LinkList LB)
-{//多项式的减法
-    LinkList p=LB->next;    //p是链表LB的工作指针，初始化为首元结点
-    while(p)         //每项系数取相反数
-    {
-        p->coe*=-1;
-        p=p->next;
-    }
-    OutputPolynomial(Add(LA, LB));
-}
-void Mul(LinkList LA,LinkList LB)
-{//多项式的乘法
-    LinkList pa=LA->next; //pa和pb是链表LA和LB的工作指针，均初始化为首元结点；
-    LinkList pb=LB->next;
-    LinkList LC;    //目标多项式链表LC
-    CreatePolynomial(LC, 0);
-    LinkList temp;    //记录中间结果
-    CreatePolynomial(temp, 0);
-    while(pa)
-    {
-        while(pb)
-        {
-            LinkList p=new LNode;//p是记录中间结果的辅助指针
-            p->next=NULL;
-            p->coe=pa->coe*pb->coe;
-            p->exp=pa->exp+pb->exp;
-            temp->next=p;
-            LC=Add(LC,temp);
-            pb=pb->next;
-        }
-        pb=LB->next;
-        pa=pa->next;
-    }
-    OutputPolynomial(LC);
-}
-void Diff(LinkList L)
-{//多项式的求导运算
-    LinkList p=L->next;  //p是链表L的工作指针，初始化为首元结点
-    LinkList r=NULL;  //r是删除操作的辅助指针
-    while(p)
-    {
-        p->coe*=p->exp;
-        p->exp--;
-        if(p->exp<0)  //所有数据的指数大于等于0
-        {
-            r=p;
-            p=p->next;
-            delete r;
-        }
-        else
-        {
-            p=p->next;
-        }
-    }
-    OutputPolynomial(L);
-}
-void Opt(LinkList &LA,LinkList &LB,string s)
-{//依据字符选择多项式的加法、减法、乘法和求导运算
-    if(s=="+") OutputPolynomial(Add(LA, LB));
-    if(s=="-") Minus(LA, LB);
-    if(s=="*") Mul(LA, LB);
-    if(s=="'")
-    {
-        Diff(LA);
-        Diff(LB);
-    }
-}
-int main()
-{
-    int n;    //总计有n组数据
-    cin>>n;
-    while(n--)
-    {
-        int a,b;
-        cin>>a>>b;
-        LinkList LA,LB;
-        CreatePolynomial(LA,a);
-        CreatePolynomial(LB,b);
-        string s;
-        cin>>s;
-        Opt(LA,LB,s);
-    }
+    HuffmanNode* huffmanTree = buildHuffmanTree(frequencies);
+    unordered_map<char, string> huffmanCodes;
+    generateHuffmanCodes(huffmanTree, "", huffmanCodes);
+    cout << "Huffman Tree:" << endl;
+    printHuffmanTree(huffmanTree);
+    string encodedMessage = encodeMessage(message, huffmanCodes);
+    cout << "Encoded Message: " << encodedMessage << endl;
+    ofstream outFile("hfmTree.txt");
+    storeHuffmanTree(huffmanTree, outFile);
+    outFile.close();
+    ifstream inFile("hfmTree.txt");
+    HuffmanNode* readHuffmanTree = readHuffmanTree(inFile);
+    inFile.close();
+    string decodedMessage = decodeMessage(readHuffmanTree, encodedMessage);
+    cout << "Decoded Message: " << decodedMessage << endl;
     return 0;
 }
