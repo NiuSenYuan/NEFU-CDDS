@@ -1,26 +1,22 @@
 #include <iostream>
 #include <stack>
 #include <queue>
-#include <cstring> 
-#include <iomanip>
+#include <cstring>
 using namespace std;
-// 定义学生记录类型
+
 struct Student {
-    char num[6];  // 学号
-    int grade;    // 成绩
+    char num[6];
+    int grade;
 };
 
-// 定义二叉排序树节点值的类型为学生记录类型
 typedef Student ElemType;
 
-// 定义二叉排序树的节点类型
 struct BSTNode {
     ElemType data;
-    struct BSTNode *left;
-    struct BSTNode *rchild;
+    BSTNode *left;
+    BSTNode *rchild;
 };
 
-// 函数声明
 BSTNode *insert(BSTNode *root, const ElemType &student);
 void inorderTraversal(BSTNode *root);
 int depth(BSTNode *root);
@@ -35,77 +31,77 @@ int main() {
     int choice;
 
     do {
-        std::cout << "\nBinary Search Tree Operations:" << std::endl;
-        std::cout << "1. Insert a student record" << std::endl;
-        std::cout << "2. Inorder traversal" << std::endl;
-        std::cout << "3. Calculate tree depth" << std::endl;
-        std::cout << "4. Count total nodes" << std::endl;
-        std::cout << "5. Count leaf nodes" << std::endl;
-        std::cout << "6. Search for a student record" << std::endl;
-        std::cout << "7. Remove a student record" << std::endl;
-        std::cout << "8. Print tree as list (generalized list)" << std::endl;
-        std::cout << "9. Exit" << std::endl;
-        std::cout << "Enter your choice: ";
-        std::cin >> choice;
+        cout << "\nBinary Search Tree Operations:" << endl;
+        cout << "1. Insert a student record" << endl;
+        cout << "2. Inorder traversal" << endl;
+        cout << "3. Calculate tree depth" << endl;
+        cout << "4. Count total nodes" << endl;
+        cout << "5. Count leaf nodes" << endl;
+        cout << "6. Search for a student record" << endl;
+        cout << "7. Remove a student record" << endl;
+        cout << "8. Print tree as list (generalized list)" << endl;
+        cout << "9. Exit" << endl;
+        cout << "Enter your choice: ";
+        cin >> choice;
 
         switch (choice) {
             case 1: {
                 Student newStudent;
-                std::cout << "Enter student number (5 characters): ";
-                std::cin >> newStudent.num;
-                std::cout << "Enter student grade: ";
-                std::cin >> newStudent.grade;
+                cout << "Enter student number (5 characters): ";
+                cin >> newStudent.num;
+                cout << "Enter student grade: ";
+                cin >> newStudent.grade;
                 root = insert(root, newStudent);
                 break;
             }
             case 2: {
-                std::cout << "Inorder Traversal:" << std::endl;
+                cout << "Inorder Traversal:" << endl;
                 inorderTraversal(root);
-                std::cout << std::endl;
+                cout << endl;
                 break;
             }
             case 3: {
-                std::cout << "Tree Depth: " << depth(root) << std::endl;
+                cout << "Tree Depth: " << depth(root) << endl;
                 break;
             }
             case 4: {
-                std::cout << "Total Nodes: " << countNodes(root) << std::endl;
+                cout << "Total Nodes: " << countNodes(root) << endl;
                 break;
             }
             case 5: {
-                std::cout << "Leaf Nodes: " << countLeaves(root) << std::endl;
+                cout << "Leaf Nodes: " << countLeaves(root) << endl;
                 break;
             }
             case 6: {
                 char searchNum[6];
-                std::cout << "Enter student number to search: ";
-                std::cin >> searchNum;
+                cout << "Enter student number to search: ";
+                cin >> searchNum;
                 if (search(root, searchNum)) {
-                    std::cout << "Student record found." << std::endl;
+                    cout << "Student record found." << endl;
                 } else {
-                    std::cout << "Student record not found." << std::endl;
+                    cout << "Student record not found." << endl;
                 }
                 break;
             }
             case 7: {
                 char removeNum[6];
-                std::cout << "Enter student number to remove: ";
-                std::cin >> removeNum;
+                cout << "Enter student number to remove: ";
+                cin >> removeNum;
                 root = remove(root, removeNum);
                 break;
             }
             case 8: {
-                std::cout << "Binary Search Tree as Generalized List:" << std::endl;
+                cout << "Binary Search Tree as Generalized List:" << endl;
                 printTreeAsList(root);
-                std::cout << std::endl;
+                cout << endl;
                 break;
             }
             case 9: {
-                std::cout << "Exiting program." << std::endl;
+                cout << "Exiting program." << endl;
                 break;
             }
             default: {
-                std::cout << "Invalid choice. Please enter a valid option." << std::endl;
+                cout << "Invalid choice. Please enter a valid option." << endl;
             }
         }
     } while (choice != 9);
@@ -113,7 +109,6 @@ int main() {
     return 0;
 }
 
-// 插入节点
 BSTNode *insert(BSTNode *root, const ElemType &student) {
     if (root == nullptr) {
         root = new BSTNode;
@@ -127,16 +122,14 @@ BSTNode *insert(BSTNode *root, const ElemType &student) {
     return root;
 }
 
-// 中序遍历
 void inorderTraversal(BSTNode *root) {
     if (root != nullptr) {
         inorderTraversal(root->left);
-        std::cout << "Student Number: " << root->data.num << ", Grade: " << root->data.grade << std::endl;
+        cout << "Student Number: " << root->data.num << ", Grade: " << root->data.grade << endl;
         inorderTraversal(root->rchild);
     }
 }
 
-// 计算树的深度
 int depth(BSTNode *root) {
     if (root == nullptr) {
         return 0;
@@ -147,7 +140,6 @@ int depth(BSTNode *root) {
     }
 }
 
-// 计算树的总节点数
 int countNodes(BSTNode *root) {
     if (root == nullptr) {
         return 0;
@@ -156,7 +148,6 @@ int countNodes(BSTNode *root) {
     }
 }
 
-// 计算树的叶子节点数
 int countLeaves(BSTNode *root) {
     if (root == nullptr) {
         return 0;
@@ -167,26 +158,24 @@ int countLeaves(BSTNode *root) {
     }
 }
 
-// 查找学生记录
 bool search(BSTNode *root, const char *num) {
     if (root == nullptr) {
         return false;
-    } else if (std::strcmp(root->data.num, num) == 0) {
+    } else if (strcmp(root->data.num, num) == 0) {
         return true;
-    } else if (std::strcmp(num, root->data.num) < 0) {
+    } else if (strcmp(num, root->data.num) < 0) {
         return search(root->left, num);
     } else {
         return search(root->rchild, num);
     }
 }
 
-// 删除学生记录
 BSTNode *remove(BSTNode *root, const char *num) {
     if (root == nullptr) {
         return nullptr;
-    } else if (std::strcmp(num, root->data.num) < 0) {
+    } else if (strcmp(num, root->data.num) < 0) {
         root->left = remove(root->left, num);
-    } else if (std::strcmp(num, root->data.num) > 0) {
+    } else if (strcmp(num, root->data.num) > 0) {
         root->rchild = remove(root->rchild, num);
     } else {
         if (root->left == nullptr) {
@@ -211,19 +200,18 @@ BSTNode *remove(BSTNode *root, const char *num) {
     return root;
 }
 
-// 广义表形式打印树
 void printTreeAsList(BSTNode *root) {
     if (root == nullptr) {
-        std::cout << "@";
+        cout << "@";
     } else {
-        std::cout << "(";
-        std::cout << root->data.num << "," << root->data.grade;
+        cout << "(";
+        cout << root->data.num << "," << root->data.grade;
         if (root->left != nullptr || root->rchild != nullptr) {
-            std::cout << ",";
+            cout << ",";
             printTreeAsList(root->left);
-            std::cout << ",";
+            cout << ",";
             printTreeAsList(root->rchild);
         }
-        std::cout << ")";
+        cout << ")";
     }
 }
