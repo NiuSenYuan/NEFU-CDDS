@@ -17,6 +17,13 @@ struct HuffmanNode {
 		left=nullptr;
 		right=nullptr;
 	}
+	~HuffmanNode()
+	{
+		data=0;
+		frequency=0;
+		left=nullptr;
+		right=nullptr;
+	}
 };
 // 用于优先队列的比较函数
 struct CompareNodes {
@@ -145,6 +152,8 @@ int main()
     cout << "哈夫曼树：" << endl;
     printHuffmanTree(huffmanTree);
     // 将哈夫曼树存储到文件中
+    ofstream treecode("huffmanCodes.txt");
+    for(auto it:huffmanCodes) treecode<<it.first<<":"<<it.second<<endl;
     ofstream treeFile("huffmanTree.txt");
     storeHuffmanTree(huffmanTree, treeFile);
     treeFile.close();
