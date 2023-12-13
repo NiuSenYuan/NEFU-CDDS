@@ -1,217 +1,153 @@
 #include <iostream>
 #include <stack>
 #include <queue>
-#include <cstring>
+#include <fstream>
+#include <string>
+
 using namespace std;
 
+// 定义学生记录类型
 struct Student {
-    char num[6];
-    int grade;
+    char num[6];   // 学号
+    int grade;      // 成绩
 };
 
+// 定义二叉排序树节点值的类型为学生记录类型
 typedef Student ElemType;
 
+// 定义二叉排序树的节点类型
 struct BSTNode {
     ElemType data;
-    BSTNode *left;
-    BSTNode *rchild;
+    BSTNode* left;
+    BSTNode* right;
+    BSTNode(const ElemType& d) : data(d), left(nullptr), right(nullptr) {}
 };
 
-BSTNode *insert(BSTNode *root, const ElemType &student);
-void inorderTraversal(BSTNode *root);
-int depth(BSTNode *root);
-int countNodes(BSTNode *root);
-int countLeaves(BSTNode *root);
-bool search(BSTNode *root, const char *num);
-BSTNode *remove(BSTNode *root, const char *num);
-void printTreeAsList(BSTNode *root);
-
-int main() {
-    BSTNode *root = nullptr;
-    int choice;
-
-    do {
-        cout << "\nBinary Search Tree Operations:" << endl;
-        cout << "1. Insert a student record" << endl;
-        cout << "2. Inorder traversal" << endl;
-        cout << "3. Calculate tree depth" << endl;
-        cout << "4. Count total nodes" << endl;
-        cout << "5. Count leaf nodes" << endl;
-        cout << "6. Search for a student record" << endl;
-        cout << "7. Remove a student record" << endl;
-        cout << "8. Print tree as list (generalized list)" << endl;
-        cout << "9. Exit" << endl;
-        cout << "Enter your choice: ";
-        cin >> choice;
-
-        switch (choice) {
-            case 1: {
-                Student newStudent;
-                cout << "Enter student number (5 characters): ";
-                cin >> newStudent.num;
-                cout << "Enter student grade: ";
-                cin >> newStudent.grade;
-                root = insert(root, newStudent);
-                break;
-            }
-            case 2: {
-                cout << "Inorder Traversal:" << endl;
-                inorderTraversal(root);
-                cout << endl;
-                break;
-            }
-            case 3: {
-                cout << "Tree Depth: " << depth(root) << endl;
-                break;
-            }
-            case 4: {
-                cout << "Total Nodes: " << countNodes(root) << endl;
-                break;
-            }
-            case 5: {
-                cout << "Leaf Nodes: " << countLeaves(root) << endl;
-                break;
-            }
-            case 6: {
-                char searchNum[6];
-                cout << "Enter student number to search: ";
-                cin >> searchNum;
-                if (search(root, searchNum)) {
-                    cout << "Student record found." << endl;
-                } else {
-                    cout << "Student record not found." << endl;
-                }
-                break;
-            }
-            case 7: {
-                char removeNum[6];
-                cout << "Enter student number to remove: ";
-                cin >> removeNum;
-                root = remove(root, removeNum);
-                break;
-            }
-            case 8: {
-                cout << "Binary Search Tree as Generalized List:" << endl;
-                printTreeAsList(root);
-                cout << endl;
-                break;
-            }
-            case 9: {
-                cout << "Exiting program." << endl;
-                break;
-            }
-            default: {
-                cout << "Invalid choice. Please enter a valid option." << endl;
-            }
-        }
-    } while (choice != 9);
-
-    return 0;
-}
-
-BSTNode *insert(BSTNode *root, const ElemType &student) {
+// 插入节点到二叉排序树
+BSTNode* insert(BSTNode* root, const ElemType& value) {
     if (root == nullptr) {
-        root = new BSTNode;
-        root->data = student;
-        root->left = root->rchild = nullptr;
-    } else if (student.grade < root->data.grade) {
-        root->left = insert(root->left, student);
-    } else {
-        root->rchild = insert(root->rchild, student);
+        return new BSTNode(value);
     }
+
+    if (value.grade < root->data.grade) {
+        root->left = insert(root->left, value);
+    } else if (value.grade > root->data.grade) {
+        root->right = insert(root->right, value);
+    }
+
     return root;
 }
 
-void inorderTraversal(BSTNode *root) {
+// 中序遍历二叉排序树
+void inorderTraversal(BSTNode* root) {
     if (root != nullptr) {
         inorderTraversal(root->left);
-        cout << "Student Number: " << root->data.num << ", Grade: " << root->data.grade << endl;
-        inorderTraversal(root->rchild);
+        cout << "学号: " << root->data.num << " 成绩: " << root->data.grade << endl;
+        inorderTraversal(root->right);
     }
 }
 
-int depth(BSTNode *root) {
+// 求二叉排序树深度
+int treeDepth(BSTNode* root) {
     if (root == nullptr) {
         return 0;
-    } else {
-        int leftDepth = depth(root->left);
-        int rightDepth = depth(root->rchild);
-        return (leftDepth > rightDepth) ? (leftDepth + 1) : (rightDepth + 1);
     }
+
+    int leftDepth = treeDepth(root->left);
+    int rightDepth = treeDepth(root->right);
+
+    return max(leftDepth, rightDepth) + 1;
 }
 
-int countNodes(BSTNode *root) {
+// 求二叉排序树的节点数
+int nodeCount(BSTNode* root) {
     if (root == nullptr) {
         return 0;
-    } else {
-        return countNodes(root->left) + countNodes(root->rchild) + 1;
     }
+
+    return nodeCount(root->left) + nodeCount(root->right) + 1;
 }
 
-int countLeaves(BSTNode *root) {
+// 求二叉排序树的叶子节点数
+int leafCount(BSTNode* root) {
     if (root == nullptr) {
         return 0;
-    } else if (root->left == nullptr && root->rchild == nullptr) {
+    }
+
+    if (root->left == nullptr && root->right == nullptr) {
         return 1;
-    } else {
-        return countLeaves(root->left) + countLeaves(root->rchild);
     }
+
+    return leafCount(root->left) + leafCount(root->right);
 }
 
-bool search(BSTNode *root, const char *num) {
-    if (root == nullptr) {
-        return false;
-    } else if (strcmp(root->data.num, num) == 0) {
-        return true;
-    } else if (strcmp(num, root->data.num) < 0) {
-        return search(root->left, num);
-    } else {
-        return search(root->rchild, num);
-    }
-}
-
-BSTNode *remove(BSTNode *root, const char *num) {
-    if (root == nullptr) {
-        return nullptr;
-    } else if (strcmp(num, root->data.num) < 0) {
-        root->left = remove(root->left, num);
-    } else if (strcmp(num, root->data.num) > 0) {
-        root->rchild = remove(root->rchild, num);
-    } else {
-        if (root->left == nullptr) {
-            BSTNode *temp = root->rchild;
-            delete root;
-            return temp;
-        } else if (root->rchild == nullptr) {
-            BSTNode *temp = root->left;
-            delete root;
-            return temp;
-        }
-
-        BSTNode *temp = root->rchild;
-        while (temp->left != nullptr) {
-            temp = temp->left;
-        }
-
-        root->data = temp->data;
-        root->rchild = remove(root->rchild, temp->data.num);
+// 从文件读取学生记录建立二叉排序树
+BSTNode* buildBSTFromFile(const string& filename) {
+    ifstream inFile(filename);
+    if (!inFile.is_open()) {
+        cerr << "无法打开文件：" << filename << endl;
+        exit(EXIT_FAILURE);
     }
 
+    BSTNode* root = nullptr;
+    ElemType student;
+
+    while (inFile >> student.num >> student.grade) {
+        root = insert(root, student);
+    }
+
+    inFile.close();
     return root;
 }
 
-void printTreeAsList(BSTNode *root) {
+// 广义表形式输出二叉排序树
+void printBSTasList(BSTNode* root) {
     if (root == nullptr) {
-        cout << "@";
-    } else {
-        cout << "(";
-        cout << root->data.num << "," << root->data.grade;
-        if (root->left != nullptr || root->rchild != nullptr) {
-            cout << ",";
-            printTreeAsList(root->left);
-            cout << ",";
-            printTreeAsList(root->rchild);
-        }
-        cout << ")";
+        cout << "()";
+        return;
     }
+
+    cout << "(";
+    cout << root->data.num << " " << root->data.grade << " ";
+    printBSTasList(root->left);
+    cout << " ";
+    printBSTasList(root->right);
+    cout << ")";
+}
+
+int main() {
+    BSTNode* root = nullptr;
+
+    // 从键盘输入一组学生记录建立二叉排序树
+    cout << "请输入学生记录，学号和成绩，以0 0结束：" << endl;
+    ElemType student;
+    while (cin >> student.num >> student.grade && (student.num[0] != '0' || student.grade != 0)) {
+        root = insert(root, student);
+    }
+
+    // 中序遍历二叉排序树
+    cout << "中序遍历结果：" << endl;
+    inorderTraversal(root);
+
+    // 求二叉排序树深度
+    cout << "二叉排序树深度：" << treeDepth(root) << endl;
+
+    // 求二叉排序树的节点数和叶子节点数
+    cout << "二叉排序树节点数：" << nodeCount(root) << endl;
+    cout << "二叉排序树叶子节点数：" << leafCount(root) << endl;
+
+    // 向二叉排序树插入一条学生记录
+    ElemType newStudent;
+    cout << "请输入要插入的学生记录（学号 成绩）：" << endl;
+    cin >> newStudent.num >> newStudent.grade;
+    root = insert(root, newStudent);
+
+    // 从文件中读取学生记录建立二叉排序树
+    root = buildBSTFromFile("students.txt");
+
+    // 广义表形式输出二叉排序树
+    cout << "二叉排序树的广义表形式：" << endl;
+    printBSTasList(root);
+
+    return 0;
 }
