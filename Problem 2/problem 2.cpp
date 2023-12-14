@@ -26,7 +26,6 @@ struct Graph{
 		vexnum=0;
 		arcnum=0;
 		memset(arcs,INF,sizeof arcs);
-		memset(answer,INF,sizeof answer);
 		memset(vis,false,sizeof vis);
 	}
 	//得到景点编号 
@@ -115,6 +114,7 @@ struct Graph{
 	//弗洛伊德算法求景点之间的最短路 
 	void Floyd()
 	{
+		memset(answer,INF,sizeof answer);
 		for(int k=1;k<=this->vexnum;k++)
 		{
 			for(int i=1;i<=this->vexnum;i++)
@@ -143,6 +143,7 @@ struct Graph{
 struct Graph G;
 int stk[MAXNUM];
 int top;
+//深度优先遍历得到两点之间的所有路径 
 void DFS(int start,int end)
 {
     stk[top]=start;
@@ -163,7 +164,7 @@ void DFS(int start,int end)
             else
             {
                 DFS(i,end);
-                top--;     //支路全被访问一遍,顶点出栈
+                top--; 
                 G.vis[i]=0;
             }
         }
@@ -202,6 +203,7 @@ int main()
 	//输出景点之间的最短路 
 	G.PrintMinDis();
 	//输出两个景点之间的所有路径
+	cout<<"输出两个景点之间的所有路径！"<<endl;
 	string view1,view2;
 	cin>>view1>>view2;
 	int start=G.GetNum(view1);
