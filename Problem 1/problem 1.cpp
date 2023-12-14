@@ -6,8 +6,8 @@
 using namespace std;
 // 定义哈夫曼树结点的结构
 struct HuffmanNode {
-    char data;
-    int frequency;
+    char data;          //节点数据
+    int frequency;      //节点权值
     HuffmanNode* left;
     HuffmanNode* right;
     HuffmanNode(char d, int freq)
@@ -51,7 +51,7 @@ HuffmanNode* buildHuffmanTree(const unordered_map<char, int>& frequencies) {
     }
     return pq.top();
 }
-// 生成哈夫曼编码并存储在map中的函数
+// 生成哈夫曼编码并存储在map中
 void generateHuffmanCodes(HuffmanNode* root, const string& code, unordered_map<char, string>& huffmanCodes) {
     if (root == nullptr) {
         return;
@@ -62,7 +62,7 @@ void generateHuffmanCodes(HuffmanNode* root, const string& code, unordered_map<c
     generateHuffmanCodes(root->left, code + "0", huffmanCodes);
     generateHuffmanCodes(root->right, code + "1", huffmanCodes);
 }
-// 使用哈夫曼编码对消息进行编码的函数
+// 使用哈夫曼编码对消息进行编码
 string encodeMessage(const string& message, const unordered_map<char, string>& huffmanCodes) {
     string encodedMessage = "";
     for (char c : message) {
@@ -70,7 +70,7 @@ string encodeMessage(const string& message, const unordered_map<char, string>& h
     }
     return encodedMessage;
 }
-// 使用哈夫曼树对消息进行解码的函数
+// 使用哈夫曼树对消息进行解码
 string decodeMessage(HuffmanNode* root, const string& encodedMessage) {
     string decodedMessage = "";
     HuffmanNode* current = root;
@@ -87,7 +87,7 @@ string decodeMessage(HuffmanNode* root, const string& encodedMessage) {
     }
     return decodedMessage;
 }
-// 以树形格式打印哈夫曼树的函数
+// 以树形格式打印哈夫曼树-中序遍历 
 void printHuffmanTree(HuffmanNode* root, int space = 0) {
     if (root == nullptr) {
         return;
@@ -102,7 +102,7 @@ void printHuffmanTree(HuffmanNode* root, int space = 0) {
     cout << root->data << "(" << root->frequency << ")" << endl;
     printHuffmanTree(root->left, space);
 }
-// 将哈夫曼树存储到文件的函数
+// 将哈夫曼树存储到文件
 void storeHuffmanTree(HuffmanNode* root, ofstream& outFile) {
     if (root == nullptr) {
         return;
@@ -115,7 +115,7 @@ void storeHuffmanTree(HuffmanNode* root, ofstream& outFile) {
         storeHuffmanTree(root->right, outFile);
     }
 }
-// 从文件中读取哈夫曼树的函数
+// 从文件中读取哈夫曼树
 HuffmanNode* readHuffmanTree(ifstream& inFile) {
     char type;
     inFile >> type;
