@@ -27,6 +27,7 @@ struct Graph{
 		arcnum=0;
 		memset(arcs,INF,sizeof arcs);
 		memset(vis,false,sizeof vis);
+		memset(answer,INF,sizeof answer);
 	}
 	//得到景点编号 
 	int GetNum(const string& Name)
@@ -114,7 +115,6 @@ struct Graph{
 	//弗洛伊德算法求景点之间的最短路 
 	void Floyd()
 	{
-		memset(answer,INF,sizeof answer);
 		for(int k=1;k<=this->vexnum;k++)
 		{
 			for(int i=1;i<=this->vexnum;i++)
@@ -209,33 +209,5 @@ int main()
 	int start=G.GetNum(view1);
 	int end=G.GetNum(view2);
 	DFS(start,end);	 
-    return 0;
+    	return 0;
 }
-/*
-10 15
-1 行政楼 办公 
-2 食堂 吃饭 
-3 赛博楼 信息分院办公室所在地
-4 求是楼 实验楼计算机中心
-5 格致楼 法学管理学院
-6 工程实习中心 金工实习
-7 仰仪楼 机电计测分院
-8 体育馆 旁边有篮球场、足球场、还有网球场
-9 一号教学楼 主要以阶梯教室为主
-10 二号教学楼 小教室为多
-行政楼 食堂 300
-行政楼 仰仪楼 200
-体育馆 一号教学楼 150
-二号教学楼 仰仪楼 350
-一号教学楼 二号教学楼 400
-工程实习中心 格致楼 500
-行政楼 工程实习中心 200
-求是楼 仰仪楼 100
-体育馆 工程实习中心 150
-食堂 体育馆 100
-体育馆 赛博楼 450
-格致楼 二号教学楼 50
-求是楼 赛博楼 150
-一号教学楼 食堂 300
-二号教学楼 工程实习中心  70
-*/ 
